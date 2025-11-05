@@ -52,7 +52,7 @@ cd bhajan-lyrics-dynamic
 - npm run dev
 
 
-🧑‍💻 Author
+## 🧑‍💻 Author
 
 Nikhil Sharma — Full Stack Developer
 Built using Next.js + MongoDB + Tailwind CSS
