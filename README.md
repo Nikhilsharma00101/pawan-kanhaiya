@@ -55,4 +55,4 @@ cd bhajan-lyrics-dynamic
 ## 🧑‍💻 Author
 
 Nikhil Sharma — Full Stack Developer
-Built using Next.js + MongoDB + Tailwind CSS
+
