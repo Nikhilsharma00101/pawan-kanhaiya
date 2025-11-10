@@ -3,6 +3,7 @@
 import { useState } from "react";
 import DashboardManager from "./DashboardManager";
 import AddBhajanDashboard from "./AddBhajan";
+import ManageBhajans from "./ManageBhajans";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("Add Bhajans");
@@ -12,14 +13,7 @@ export default function Dashboard() {
       case "Add Bhajans":
         return <AddBhajanDashboard />;
       case "Manage Bhajans":
-        return (
-          <div className="p-10">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              Manage Bhajans
-            </h2>
-            <p className="text-gray-500">This is where you’ll manage bhajans.</p>
-          </div>
-        );
+        return <ManageBhajans />;
       case "Media Library":
         return (
           <div className="p-10">
@@ -58,7 +52,17 @@ export default function Dashboard() {
       <DashboardManager activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">{renderContent()}</main>
+      <main
+        className="
+          flex-1 
+          overflow-y-auto 
+          p-4 
+          sm:ml-64      /*  prevent overlap on desktop */
+          pb-16         /*  avoid hiding behind mobile nav */
+        "
+      >
+        {renderContent()}
+      </main>
     </div>
   );
 }

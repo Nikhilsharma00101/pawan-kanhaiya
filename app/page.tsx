@@ -1,5 +1,5 @@
-import HomeBhajans from "@/components/homepage/HomeBhajans";
+import Hero from "@/components/homepage/Hero";
 
 export default function HomePage() {
-  return <HomeBhajans />;
+  return <Hero />;
 }
