@@ -33,26 +33,32 @@ export default function DashboardManager({
 }: DashboardManagerProps) {
   return (
     <>
-      {/* 🖥️ Desktop & Tablet Sidebar */}
-      <aside className="hidden sm:flex w-64 bg-white shadow-lg rounded-2xl h-screen p-4 flex-col justify-between border border-gray-100">
+      {/* 🖥️ Desktop & Tablet Sidebar (Fixed) */}
+      <aside
+        className="hidden sm:flex fixed left-0 top-0 h-screen w-64 
+        bg-white shadow-xl border-r border-gray-100 
+        flex-col justify-between p-4 z-50"
+      >
+        {/* Header */}
         <div>
           <h2 className="text-xl font-bold mb-6 text-center text-gray-700">
             🧘 Dashboard
           </h2>
 
+          {/* Navigation Tabs */}
           <ul className="space-y-2">
             {tabs.map(({ name, icon: Icon }) => (
               <li key={name}>
                 <button
                   onClick={() => setActiveTab(name)}
-                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all
+                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer
                     ${
                       activeTab === name
-                        ? "bg-blue-100 text-blue-700"
+                        ? "bg-blue-100 text-blue-700 shadow-sm"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-5 h-5 shrink-0" />
                   {name}
                 </button>
               </li>
@@ -60,13 +66,18 @@ export default function DashboardManager({
           </ul>
         </div>
 
+        {/* Footer */}
         <div className="text-center text-xs text-gray-400 mt-6">
           © {new Date().getFullYear()} Bhajan Admin
         </div>
       </aside>
 
-      {/* 📱 Mobile Bottom Navigation */}
-      <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-lg flex justify-around items-center py-2 z-999 rounded-t-2xl">
+      {/* 📱 Mobile Bottom Navigation (Fixed) */}
+      <nav
+        className="sm:hidden fixed bottom-0 left-0 w-full bg-white 
+        border-t border-gray-200 shadow-lg flex justify-around items-center 
+        py-2 z-50 rounded-t-2xl"
+      >
         {tabs.map(({ name, icon: Icon }) => (
           <button
             key={name}
