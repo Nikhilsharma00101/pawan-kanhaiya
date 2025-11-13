@@ -75,6 +75,58 @@ export default function Hero() {
     }
   }
 
+  // ✅ Utility: inject translations only once per full translation block
+function injectTranslations(html: string) {
+  if (typeof window === "undefined") return html;
+
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  // Remove old translation blocks
+  container.querySelectorAll(".translation-block").forEach((n) => n.remove());
+
+  const spans = Array.from(container.querySelectorAll("[data-translation]")) as HTMLElement[];
+
+  if (spans.length === 0) return container.innerHTML;
+
+  let group: HTMLElement[] = [];
+  let lastTranslation = "";
+
+  const flushGroup = () => {
+    if (group.length === 0 || !lastTranslation) return;
+    const block = document.createElement("div");
+    block.className =
+      "translation-block text-amber-700 text-sm mt-2 mb-3 italic border-l-2 border-amber-300 pl-3";
+    block.textContent = lastTranslation;
+    group[group.length - 1].insertAdjacentElement("afterend", block);
+    group = [];
+    lastTranslation = "";
+  };
+
+  spans.forEach((span, i) => {
+    const translation = span.getAttribute("data-translation")?.trim();
+    if (!translation) return;
+
+    if (translation === lastTranslation || group.length === 0) {
+      group.push(span);
+      lastTranslation = translation;
+    } else {
+      flushGroup();
+      group = [span];
+      lastTranslation = translation;
+    }
+
+    // flush at the end
+    if (i === spans.length - 1) flushGroup();
+  });
+
+  return container.innerHTML;
+}
+
+
+
+
+
   return (
     <motion.div
       initial="initial"
@@ -101,7 +153,7 @@ export default function Hero() {
       {/* Navbar */}
       <Navbar playing={playing} toggleAudio={toggleAudio} />
 
-       {/* =================== MAIN CONTENT =================== */}
+      {/* =================== MAIN CONTENT =================== */}
       <main className="pt-36 w-full px-6 sm:px-10 md:px-16 lg:px-24 mt-5">
         {loading && (
           <div className="flex flex-col items-center justify-center h-64">
@@ -110,7 +162,9 @@ export default function Hero() {
               transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
               className="w-16 h-16 rounded-full border-4 border-amber-400 border-t-transparent"
             />
-            <p className="text-amber-700 mt-6 font-semibold">🔱 भजन लोड हो रहे हैं...</p>
+            <p className="text-amber-700 mt-6 font-semibold">
+              🔱 भजन लोड हो रहे हैं...
+            </p>
           </div>
         )}
 
@@ -127,7 +181,9 @@ export default function Hero() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto"
             >
               {Object.keys(grouped).length === 0 && (
-                <div className="col-span-full text-center text-amber-600 p-10">कोई भजन उपलब्ध नहीं है</div>
+                <div className="col-span-full text-center text-amber-600 p-10">
+                  कोई भजन उपलब्ध नहीं है
+                </div>
               )}
 
               {Object.keys(grouped).map((category) => (
@@ -138,19 +194,20 @@ export default function Hero() {
                   onClick={() => setSelectedCategory(category)}
                   className="relative overflow-hidden rounded-3xl shadow-xl border border-amber-300 bg-gradient-to-br from-yellow-50 to-amber-100 text-center py-12 px-6 group hover:shadow-amber-200 transition-all text-left"
                 >
-                  {/* subtle texture */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-10 bg-[url('/textures/paper-bg.png')] bg-cover transition-all" />
+                  <div className="absolute top-6 right-6 opacity-70 text-2xl">
+                    🪔
+                  </div>
 
-                  {/* glowing lamp indicator */}
-                  <div className="absolute top-6 right-6 opacity-70 text-2xl">🪔</div>
+                  <h2 className="text-2xl font-bold text-amber-800 mb-2">
+                    {category}
+                  </h2>
+                  <p className="text-amber-600 text-sm mb-4">
+                    {grouped[category].length} भजन उपलब्ध
+                  </p>
 
-                  <h2 className="text-2xl font-bold text-amber-800 mb-2">{category}</h2>
-                  <p className="text-amber-600 text-sm mb-4">{grouped[category].length} भजन उपलब्ध</p>
-
-                  <div className="mt-4 text-xs text-amber-500">देखने के लिए टैप करें</div>
-
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-40 h-20 opacity-0 group-hover:opacity-60 transform rotate-12 pointer-events-none">
-                    <div className="w-full h-full bg-gradient-to-tr from-white/30 to-transparent blur-lg rounded-full" />
+                  <div className="mt-4 text-xs text-amber-500">
+                    देखने के लिए टैप करें
                   </div>
                 </motion.button>
               ))}
@@ -174,7 +231,11 @@ export default function Hero() {
                 >
                   <ArrowLeft size={18} /> वापस जाएँ
                 </button>
-                <h2 className={`${heading.className} text-3xl font-bold text-amber-800`}>{selectedCategory}</h2>
+                <h2
+                  className={`${heading.className} text-3xl font-bold text-amber-800`}
+                >
+                  {selectedCategory}
+                </h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -186,8 +247,12 @@ export default function Hero() {
                     onClick={() => setSelectedBhajan(b)}
                     className="cursor-pointer rounded-2xl p-6 bg-gradient-to-b from-white to-yellow-50 shadow-lg border border-amber-200 hover:border-amber-400 hover:shadow-amber-200 transition"
                   >
-                    <h3 className="text-xl font-semibold text-amber-800 mb-2">{b.title}</h3>
-                    <p className="text-amber-600 text-sm line-clamp-3">{b.description || "भजन देखने के लिए क्लिक करें"}</p>
+                    <h3 className="text-xl font-semibold text-amber-800 mb-2">
+                      {b.title}
+                    </h3>
+                    <p className="text-amber-600 text-sm line-clamp-3">
+                      {b.description || "भजन देखने के लिए क्लिक करें"}
+                    </p>
                   </motion.article>
                 ))}
               </div>
@@ -211,24 +276,43 @@ export default function Hero() {
                 <ArrowLeft size={18} /> पीछे जाएँ
               </button>
 
-              <h2 className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}>{selectedBhajan.title}</h2>
+              <h2
+                className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}
+              >
+                {selectedBhajan.title}
+              </h2>
 
-              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line" dangerouslySetInnerHTML={{ __html: selectedBhajan.lyrics }} />
+              {/* ✅ Lyrics with inline translations */}
+              <div
+                className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
+                dangerouslySetInnerHTML={{
+                  __html: injectTranslations(selectedBhajan.lyrics),
+                }}
+              />
 
-              <div className="mt-8 text-center text-sm text-amber-600 italic">श्रेणी: {selectedBhajan.category}</div>
+              <div className="mt-8 text-center text-sm text-amber-600 italic">
+                श्रेणी: {selectedBhajan.category}
+              </div>
 
               {/* Action row */}
               <div className="mt-6 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <button className="px-4 py-2 rounded-full bg-amber-100/70">🕉️ प्रिंट</button>
+                  <button className="px-4 py-2 rounded-full bg-amber-100/70">
+                    🕉️ प्रिंट
+                  </button>
                   <button
                     onClick={() => {
-                      // open a share dialog
                       if (navigator.share) {
-                        navigator.share({ title: selectedBhajan.title, text: selectedBhajan.lyrics }).catch(() => {});
+                        navigator
+                          .share({
+                            title: selectedBhajan.title,
+                            text: selectedBhajan.lyrics,
+                          })
+                          .catch(() => {});
                       } else {
-                        // fallback
-                        navigator.clipboard?.writeText(`${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`);
+                        navigator.clipboard?.writeText(
+                          `${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`
+                        );
                         alert("Lyrics copied to clipboard");
                       }
                     }}
@@ -239,21 +323,38 @@ export default function Hero() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <button onClick={() => { if (audioRef.current) { audioRef.current.currentTime = 0; audioRef.current.play().catch(()=>{}); setPlaying(true); }}} className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white">▶️ सुनें</button>
+                  <button
+                    onClick={() => {
+                      if (audioRef.current) {
+                        audioRef.current.currentTime = 0;
+                        audioRef.current.play().catch(() => {});
+                        setPlaying(true);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white"
+                  >
+                    ▶️ सुनें
+                  </button>
                 </div>
               </div>
             </motion.section>
           )}
         </AnimatePresence>
 
-        {/* About section (simple) */}
+        {/* About section */}
         <section id="about" className="max-w-7xl mx-auto mt-16">
           <div className="bg-white/80 rounded-2xl p-8 border border-amber-100 shadow-sm">
-            <h3 className={`${heading.className} text-2xl mb-2 text-amber-800`}>हमारे बारे में</h3>
-            <p className="text-amber-700">यह संग्रह भक्तिमय भजनों के लिए बनाया गया है — साधारण, परिश्रमी और ध्यान केंद्रित अनुभव के साथ।</p>
+            <h3
+              className={`${heading.className} text-2xl mb-2 text-amber-800`}
+            >
+              हमारे बारे में
+            </h3>
+            <p className="text-amber-700">
+              यह संग्रह भक्तिमय भजनों के लिए बनाया गया है — साधारण, परिश्रमी
+              और ध्यान केंद्रित अनुभव के साथ।
+            </p>
           </div>
         </section>
-
       </main>
     </motion.div>
   );
