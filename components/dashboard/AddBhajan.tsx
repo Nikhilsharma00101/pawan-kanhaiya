@@ -160,11 +160,32 @@ export default function AddBhajanDashboard() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-100 outline-none text-sm sm:text-base"
                   >
                     <option value="">Select a Category</option>
-                    <option value="Ram Bhajans">Ram Bhajans</option>
-                    <option value="Sunderkand">Shiv Bhajan</option>
-                    <option value="Hanuman Bhajans">Hanuman Bhajans</option>
-                    <option value="Krishna Bhajans">Krishna Bhajans</option>
-                    <option value="Sunderkand">Sunderkand</option>
+<option value="Ram Bhajans">Ram Bhajans</option>
+<option value="Hanuman Bhajans">Hanuman Bhajans</option>
+<option value="Krishna Bhajans">Krishna Bhajans</option>
+<option value="Shiv Bhajans">Shiv Bhajans</option>
+<option value="Vishnu Bhajans">Vishnu Bhajans</option>
+<option value="Durga Bhajans">Durga Bhajans</option>
+<option value="Lakshmi Bhajans">Lakshmi Bhajans</option>
+<option value="Saraswati Bhajans">Saraswati Bhajans</option>
+<option value="Ganesh Bhajans">Ganesh Bhajans</option>
+<option value="Mata Rani Bhajans">Mata Rani Bhajans</option>
+<option value="Kali Bhajans">Kali Bhajans</option>
+<option value="Sunderkand">Sunderkand</option>
+<option value="Aarti">Aarti</option>
+<option value="Mantras">Mantras</option>
+<option value="Stotra">Stotra</option>
+<option value="Bhakti Songs">Bhakti Songs</option>
+<option value="Festival Bhajans">Festival Bhajans</option>
+<option value="Morning Bhajans">Morning Bhajans</option>
+<option value="Evening Bhajans">Evening Bhajans</option>
+<option value="Meditation & Peace">Meditation & Peace</option>
+<option value="Devotional Classics">Devotional Classics</option>
+
+
+
+
+
                   </select>
                 </div>
               </div>
