@@ -170,11 +170,13 @@ export default function ManageBhajansAdmin() {
     );
   }, [selectedCategory, grouped, searchQuery]);
 
-  const totalPages = Math.ceil(filteredBhajans.length / perPage);
-  const paginated = filteredBhajans.slice(
-    (page - 1) * perPage,
-    page * perPage
-  );
+  const safeFiltered = filteredBhajans || [];
+const totalPages = Math.ceil(safeFiltered.length / perPage) || 1;
+const paginated = safeFiltered.slice(
+  (page - 1) * perPage,
+  page * perPage
+);
+
 
   return (
     <motion.div
