@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Playfair_Display, Noto_Serif_Devanagari } from "next/font/google";
 import Navbar from "../Navbar";
+import RelatedBhajans from "./RelatedBhajans";
+import CategoryBhajans from "./CategoryBhajans";
+
 
 const heading = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
 const body = Noto_Serif_Devanagari({
@@ -261,84 +264,91 @@ function injectTranslations(html: string) {
 
           {/* ======= LYRICS VIEW ======= */}
           {selectedBhajan && (
-            <motion.section
-              key="lyrics"
-              variants={fade}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full max-w-4xl bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative mx-auto"
-            >
-              <button
-                onClick={() => setSelectedBhajan(null)}
-                className="absolute top-6 left-6 flex items-center gap-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition cursor-pointer"
-              >
-                <ArrowLeft size={18} /> पीछे जाएँ
-              </button>
+  <motion.section
+    key="lyrics"
+    variants={fade}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 relative"
+  >
+    {/* Left: Lyrics section */}
+    <div className="flex-1 bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative">
+      <button
+        onClick={() => setSelectedBhajan(null)}
+        className="absolute top-6 left-6 flex items-center gap-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition cursor-pointer"
+      >
+        <ArrowLeft size={18} /> पीछे जाएँ
+      </button>
 
-              <h2
-                className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}
-              >
-                {selectedBhajan.title}
-              </h2>
+      <h2
+        className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}
+      >
+        {selectedBhajan.title}
+      </h2>
 
-              {/* ✅ Lyrics with inline translations */}
-              <div
-                className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
-                dangerouslySetInnerHTML={{
-                  __html: injectTranslations(selectedBhajan.lyrics),
-                }}
-              />
+      <div
+        className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
+        dangerouslySetInnerHTML={{
+          __html: injectTranslations(selectedBhajan.lyrics),
+        }}
+      />
 
-              <div className="mt-8 text-center text-sm text-amber-600 italic">
-                श्रेणी: {selectedBhajan.category}
-              </div>
+      <div className="mt-8 text-center text-sm text-amber-600 italic">
+        श्रेणी: {selectedBhajan.category}
+      </div>
 
-              {/* Action row */}
-              <div className="mt-6 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <button className="px-4 py-2 rounded-full bg-amber-100/70">
-                    🕉️ प्रिंट
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (navigator.share) {
-                        navigator
-                          .share({
-                            title: selectedBhajan.title,
-                            text: selectedBhajan.lyrics,
-                          })
-                          .catch(() => {});
-                      } else {
-                        navigator.clipboard?.writeText(
-                          `${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`
-                        );
-                        alert("Lyrics copied to clipboard");
-                      }
-                    }}
-                    className="px-4 py-2 rounded-full bg-amber-100/70"
-                  >
-                    ↗️ शेयर करें
-                  </button>
-                </div>
+      {/* Action row */}
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <button className="px-4 py-2 rounded-full bg-amber-100/70">🕉️ प्रिंट</button>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator
+                  .share({
+                    title: selectedBhajan.title,
+                    text: selectedBhajan.lyrics,
+                  })
+                  .catch(() => {});
+              } else {
+                navigator.clipboard?.writeText(
+                  `${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`
+                );
+                alert("Lyrics copied to clipboard");
+              }
+            }}
+            className="px-4 py-2 rounded-full bg-amber-100/70"
+          >
+            ↗️ शेयर करें
+          </button>
+        </div>
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      if (audioRef.current) {
-                        audioRef.current.currentTime = 0;
-                        audioRef.current.play().catch(() => {});
-                        setPlaying(true);
-                      }
-                    }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white"
-                  >
-                    ▶️ सुनें
-                  </button>
-                </div>
-              </div>
-            </motion.section>
-          )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play().catch(() => {});
+                setPlaying(true);
+              }
+            }}
+            className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white"
+          >
+            ▶️ सुनें
+          </button>
+        </div>
+      </div>
+    </div>
+
+   {/* Right Side */}
+<div className="hidden lg:block">
+  <RelatedBhajans injectTranslations={injectTranslations} />
+</div>
+
+  </motion.section>
+)}
+
         </AnimatePresence>
 
         {/* About section */}
