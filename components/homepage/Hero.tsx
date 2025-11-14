@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Playfair_Display, Noto_Serif_Devanagari } from "next/font/google";
 import Navbar from "../Navbar";
+import RelatedBhajans from "./left-sidebar";
+import CategoryBhajans from "./right-sidebar";
+
 
 const heading = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
 const body = Noto_Serif_Devanagari({
@@ -70,58 +73,58 @@ export default function Hero() {
       audioRef.current.pause();
       setPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {});
+      audioRef.current.play().catch(() => { });
       setPlaying(true);
     }
   }
 
   // ✅ Utility: inject translations only once per full translation block
-function injectTranslations(html: string) {
-  if (typeof window === "undefined") return html;
+  function injectTranslations(html: string) {
+    if (typeof window === "undefined") return html;
 
-  const container = document.createElement("div");
-  container.innerHTML = html;
+    const container = document.createElement("div");
+    container.innerHTML = html;
 
-  // Remove old translation blocks
-  container.querySelectorAll(".translation-block").forEach((n) => n.remove());
+    // Remove old translation blocks
+    container.querySelectorAll(".translation-block").forEach((n) => n.remove());
 
-  const spans = Array.from(container.querySelectorAll("[data-translation]")) as HTMLElement[];
+    const spans = Array.from(container.querySelectorAll("[data-translation]")) as HTMLElement[];
 
-  if (spans.length === 0) return container.innerHTML;
+    if (spans.length === 0) return container.innerHTML;
 
-  let group: HTMLElement[] = [];
-  let lastTranslation = "";
+    let group: HTMLElement[] = [];
+    let lastTranslation = "";
 
-  const flushGroup = () => {
-    if (group.length === 0 || !lastTranslation) return;
-    const block = document.createElement("div");
-    block.className =
-      "translation-block text-amber-700 text-sm mt-2 mb-3 italic border-l-2 border-amber-300 pl-3";
-    block.textContent = lastTranslation;
-    group[group.length - 1].insertAdjacentElement("afterend", block);
-    group = [];
-    lastTranslation = "";
-  };
+    const flushGroup = () => {
+      if (group.length === 0 || !lastTranslation) return;
+      const block = document.createElement("div");
+      block.className =
+        "translation-block text-amber-700 text-sm mt-2 mb-3 italic border-l-2 border-amber-300 pl-3";
+      block.textContent = lastTranslation;
+      group[group.length - 1].insertAdjacentElement("afterend", block);
+      group = [];
+      lastTranslation = "";
+    };
 
-  spans.forEach((span, i) => {
-    const translation = span.getAttribute("data-translation")?.trim();
-    if (!translation) return;
+    spans.forEach((span, i) => {
+      const translation = span.getAttribute("data-translation")?.trim();
+      if (!translation) return;
 
-    if (translation === lastTranslation || group.length === 0) {
-      group.push(span);
-      lastTranslation = translation;
-    } else {
-      flushGroup();
-      group = [span];
-      lastTranslation = translation;
-    }
+      if (translation === lastTranslation || group.length === 0) {
+        group.push(span);
+        lastTranslation = translation;
+      } else {
+        flushGroup();
+        group = [span];
+        lastTranslation = translation;
+      }
 
-    // flush at the end
-    if (i === spans.length - 1) flushGroup();
-  });
+      // flush at the end
+      if (i === spans.length - 1) flushGroup();
+    });
 
-  return container.innerHTML;
-}
+    return container.innerHTML;
+  }
 
 
 
@@ -267,82 +270,99 @@ function injectTranslations(html: string) {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full max-w-4xl bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative mx-auto"
+              className="w-full max-w-7xl mx-auto relative"
             >
-              <button
-                onClick={() => setSelectedBhajan(null)}
-                className="absolute top-6 left-6 flex items-center gap-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition cursor-pointer"
-              >
-                <ArrowLeft size={18} /> पीछे जाएँ
-              </button>
-
-              <h2
-                className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}
-              >
-                {selectedBhajan.title}
-              </h2>
-
-              {/* ✅ Lyrics with inline translations */}
-              <div
-                className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
-                dangerouslySetInnerHTML={{
-                  __html: injectTranslations(selectedBhajan.lyrics),
-                }}
+              {/* LEFT SIDEBAR - Category Bhajans (Fixed - rendered directly) */}
+              <CategoryBhajans
+                injectTranslations={injectTranslations}
+                filterCategories={["राधा भजन", "Krishna Bhajans"]}
               />
 
-              <div className="mt-8 text-center text-sm text-amber-600 italic">
-                श्रेणी: {selectedBhajan.category}
-              </div>
+              {/* CENTER - Main Lyrics (centered with side margins for sidebars) */}
+              <div className="mx-auto max-w-3xl lg:mx-[340px] xl:mx-[400px] bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative">
+                {/* Back Button */}
+                <button
+                  onClick={() => setSelectedBhajan(null)}
+                  className="absolute top-6 left-6 flex items-center gap-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition cursor-pointer"
+                >
+                  <ArrowLeft size={18} /> पीछे जाएँ
+                </button>
 
-              {/* Action row */}
-              <div className="mt-6 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <button className="px-4 py-2 rounded-full bg-amber-100/70">
-                    🕉️ प्रिंट
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (navigator.share) {
-                        navigator
-                          .share({
-                            title: selectedBhajan.title,
-                            text: selectedBhajan.lyrics,
-                          })
-                          .catch(() => {});
-                      } else {
-                        navigator.clipboard?.writeText(
-                          `${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`
-                        );
-                        alert("Lyrics copied to clipboard");
-                      }
-                    }}
-                    className="px-4 py-2 rounded-full bg-amber-100/70"
-                  >
-                    ↗️ शेयर करें
-                  </button>
+                {/* Title */}
+                <h2
+                  className={`${heading.className} text-4xl font-bold text-center text-amber-800 mb-6 mt-5 pt-5 drop-shadow-md`}
+                >
+                  {selectedBhajan.title}
+                </h2>
+
+                {/* Lyrics */}
+                <div
+                  className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
+                  dangerouslySetInnerHTML={{
+                    __html: injectTranslations(selectedBhajan.lyrics),
+                  }}
+                />
+
+                {/* Category Info */}
+                <div className="mt-8 text-center text-sm text-amber-600 italic">
+                  श्रेणी: {selectedBhajan.category}
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      if (audioRef.current) {
-                        audioRef.current.currentTime = 0;
-                        audioRef.current.play().catch(() => {});
-                        setPlaying(true);
-                      }
-                    }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white"
-                  >
-                    ▶️ सुनें
-                  </button>
+                {/* Action Row */}
+                <div className="mt-6 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 rounded-full bg-amber-100/70">
+                      🕉️ प्रिंट
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator
+                            .share({
+                              title: selectedBhajan.title,
+                              text: selectedBhajan.lyrics,
+                            })
+                            .catch(() => { });
+                        } else {
+                          navigator.clipboard?.writeText(
+                            `${selectedBhajan.title}\n\n${selectedBhajan.lyrics}`
+                          );
+                          alert("Lyrics copied to clipboard");
+                        }
+                      }}
+                      className="px-4 py-2 rounded-full bg-amber-100/70"
+                    >
+                      ↗️ शेयर करें
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        if (audioRef.current) {
+                          audioRef.current.currentTime = 0;
+                          audioRef.current.play().catch(() => { });
+                          setPlaying(true);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-white"
+                    >
+                      ▶️ सुनें
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {/* RIGHT SIDEBAR - Related Bhajans (Fixed - rendered directly) */}
+              <RelatedBhajans injectTranslations={injectTranslations} />
             </motion.section>
           )}
+
+
         </AnimatePresence>
 
         {/* About section */}
-        <section id="about" className="max-w-7xl mx-auto mt-16">
+        <section id="about" className="max-w-2xl mx-auto mt-16">
           <div className="bg-white/80 rounded-2xl p-8 border border-amber-100 shadow-sm">
             <h3
               className={`${heading.className} text-2xl mb-2 text-amber-800`}
