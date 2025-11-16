@@ -11,6 +11,20 @@ export async function GET() {
 export async function POST(req: Request) {
   await connectDB();
   const data = await req.json();
-  const newBhajan = await Bhajan.create(data);
+
+  if (!data.title?.trim() || !data.lyrics?.trim() || !data.category?.trim()) {
+    return NextResponse.json(
+      { error: "Title, lyrics and category are required" },
+      { status: 400 }
+    );
+  }
+
+  const newBhajan = await Bhajan.create({
+    ...data,
+    title: data.title.trim(),
+    category: data.category.trim(),
+    lyrics: data.lyrics.trim(),
+  });
+
   return NextResponse.json(newBhajan);
 }

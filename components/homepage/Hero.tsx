@@ -1,12 +1,13 @@
 "use client";
+/** @jsxImportSource react */
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Playfair_Display, Noto_Serif_Devanagari } from "next/font/google";
 import Navbar from "../Navbar";
-import RelatedBhajans from "./left-sidebar";
-import CategoryBhajans from "./right-sidebar";
+import RelatedBhajans from "./right-sidebar";
+import CategoryBhajans from "./left-sidebar";
 
 
 const heading = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
@@ -40,7 +41,16 @@ export default function Hero() {
       try {
         const res = await fetch("/api/bhajans");
         const data: Bhajan[] = await res.json();
-        setBhajans(data);
+        // Remove corrupted / empty items
+const cleaned = data.filter(
+  (b) =>
+    b.title?.trim() &&
+    b.lyrics?.trim() &&
+    b.category?.trim()
+);
+
+setBhajans(cleaned);
+
       } catch (err) {
         console.error("Failed to load bhajans", err);
       } finally {
@@ -275,11 +285,11 @@ export default function Hero() {
               {/* LEFT SIDEBAR - Category Bhajans (Fixed - rendered directly) */}
               <CategoryBhajans
                 injectTranslations={injectTranslations}
-                filterCategories={["राधा भजन", "Krishna Bhajans"]}
+                filterCategories={["राधा भजन", "Krishna Bhajans","राधा कृष्ण भजन लड़ियाँ-1 Em or F#m","राधा कृष्ण भजन लड़ियाँ 2 F#4"]}
               />
 
               {/* CENTER - Main Lyrics (centered with side margins for sidebars) */}
-              <div className="mx-auto max-w-3xl lg:mx-[340px] xl:mx-[400px] bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative">
+              <div className="mx-auto max-w-3xl lg:mx-[340px] xl:mx-[295px] bg-white/90 rounded-3xl p-10 shadow-xl border border-amber-200 backdrop-blur-md relative">
                 {/* Back Button */}
                 <button
                   onClick={() => setSelectedBhajan(null)}
@@ -297,7 +307,7 @@ export default function Hero() {
 
                 {/* Lyrics */}
                 <div
-                  className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line"
+                  className="lyrics-container prose prose-lg max-w-none text-gray-800 leading-relaxed text-center whitespace-pre-line text-3xl"
                   dangerouslySetInnerHTML={{
                     __html: injectTranslations(selectedBhajan.lyrics),
                   }}
