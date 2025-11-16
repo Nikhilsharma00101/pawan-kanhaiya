@@ -110,7 +110,7 @@ export default function CategoryBhajans({
                       whileHover={{ scale: 1.02, x: 2 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setModalBhajan(b)}
-                      className="text-left p-3 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md"
+                      className="text-left p-3 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md cursor-pointer"
                     >
                       {b.title}
                     </motion.button>
@@ -182,7 +182,7 @@ export default function CategoryBhajans({
                   {/* Close Button */}
                   <motion.button
                     onClick={() => setModalBhajan(null)}
-                    className="absolute top-6 right-6 z-10 w-11 h-11 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/60 text-amber-700 hover:bg-amber-50 hover:text-amber-900 hover:border-amber-300 transition-all duration-200 shadow-lg hover:shadow-xl premium-glow"
+                    className="absolute top-6 right-6 z-10 w-11 h-11 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/60 text-amber-700 hover:bg-amber-50 hover:text-amber-900 hover:border-amber-300 transition-all duration-200 shadow-lg hover:shadow-xl premium-glow cursor-pointer"
                     whileHover={{ scale: 1.05, rotate: 90 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, rotate: -90 }}

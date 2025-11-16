@@ -75,7 +75,7 @@ export default function RelatedBhajans({ injectTranslations }: RelatedBhajansPro
                 whileHover={{ scale: 1.03, x: -2 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setModalBhajan(b)}
-                className="text-left p-3 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md"
+                className="text-left p-3 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md cursor-pointer"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
@@ -126,7 +126,7 @@ export default function RelatedBhajans({ injectTranslations }: RelatedBhajansPro
                   {/* Close Button */}
                   <motion.button
                     onClick={() => setModalBhajan(null)}
-                    className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/60 text-amber-700 hover:bg-amber-50 hover:text-amber-900 hover:border-amber-300 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/60 text-amber-700 hover:bg-amber-50 hover:text-amber-900 hover:border-amber-300 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
                     whileHover={{ scale: 1.1, rotate: 90 }}
                     whileTap={{ scale: 0.95 }}
                   >
