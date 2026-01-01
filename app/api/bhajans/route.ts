@@ -4,9 +4,15 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   await connectDB();
-  const bhajans = await Bhajan.find().sort({ createdAt: -1 });
+
+  const bhajans = await Bhajan.find().sort({
+    category: 1,
+    order: 1,
+  });
+
   return NextResponse.json(bhajans);
 }
+
 
 export async function POST(req: Request) {
   await connectDB();
@@ -19,11 +25,19 @@ export async function POST(req: Request) {
     );
   }
 
+  // 🔥 FIND LAST ORDER IN CATEGORY
+  const lastBhajan = await Bhajan.findOne({
+    category: data.category.trim(),
+  }).sort({ order: -1 });
+
+  const nextOrder = lastBhajan ? lastBhajan.order + 1 : 1;
+
   const newBhajan = await Bhajan.create({
     ...data,
     title: data.title.trim(),
     category: data.category.trim(),
     lyrics: data.lyrics.trim(),
+    order: nextOrder,
   });
 
   return NextResponse.json(newBhajan);
