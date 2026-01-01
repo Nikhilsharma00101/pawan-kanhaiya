@@ -2,8 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, GripVertical } from "lucide-react";
 import { createPortal } from "react-dom";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Bhajan {
   _id: string;
@@ -12,11 +29,58 @@ interface Bhajan {
   lyrics: string;
   description?: string;
   language?: string;
+  order?: number;
 }
 
 interface CategoryBhajansProps {
   injectTranslations: (html: string) => string;
   filterCategories?: string[];
+}
+
+// Sortable Bhajan Item Component
+function SortableBhajanItem({
+  bhajan,
+  onClick,
+}: {
+  bhajan: Bhajan;
+  onClick: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: bhajan._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <motion.button
+        whileHover={{ scale: 1.02, x: 2 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={onClick}
+        className="w-full text-left p-3 pl-10 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md cursor-pointer"
+      >
+        {bhajan.title}
+      </motion.button>
+      
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute left-2 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <GripVertical size={18} className="text-amber-400" />
+      </div>
+    </div>
+  );
 }
 
 export default function CategoryBhajans({
@@ -26,6 +90,13 @@ export default function CategoryBhajans({
   const [categories, setCategories] = useState<Record<string, Bhajan[]>>({});
   const [loading, setLoading] = useState(true);
   const [modalBhajan, setModalBhajan] = useState<Bhajan | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     const fetchBhajans = async () => {
@@ -38,6 +109,11 @@ export default function CategoryBhajans({
           const cat = b.category?.trim() || "अन्य भजन";
           if (!grouped[cat]) grouped[cat] = [];
           grouped[cat].push(b);
+        });
+
+        // Sort by order field within each category
+        Object.keys(grouped).forEach((cat) => {
+          grouped[cat].sort((a, b) => (a.order || 0) - (b.order || 0));
         });
 
         if (filterCategories?.length) {
@@ -59,6 +135,39 @@ export default function CategoryBhajans({
 
     fetchBhajans();
   }, [filterCategories]);
+
+  const handleDragEnd = async (event: DragEndEvent, category: string) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categories[category].findIndex((b) => b._id === active.id);
+    const newIndex = categories[category].findIndex((b) => b._id === over.id);
+
+    const newOrder = arrayMove(categories[category], oldIndex, newIndex);
+
+    // Update local state immediately
+    setCategories((prev) => ({
+      ...prev,
+      [category]: newOrder,
+    }));
+
+    // Send order update to backend
+    try {
+      const orderData = newOrder.map((bhajan, index) => ({
+        id: bhajan._id,
+        order: index + 1,
+      }));
+
+      await fetch("/api/bhajans/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: orderData }),
+      });
+    } catch (err) {
+      console.error("Failed to update order", err);
+    }
+  };
 
   return (
     <>
@@ -103,19 +212,27 @@ export default function CategoryBhajans({
                 <h4 className="font-semibold text-amber-700 mb-2 border-b border-amber-300 pb-1 text-center">
                   {cat}
                 </h4>
-                <div className="flex flex-col gap-2">
-                  {bhajans.map((b) => (
-                    <motion.button
-                      key={b._id}
-                      whileHover={{ scale: 1.02, x: 2 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setModalBhajan(b)}
-                      className="text-left p-3 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 border border-amber-200 text-amber-700 transition shadow-sm hover:shadow-md cursor-pointer"
-                    >
-                      {b.title}
-                    </motion.button>
-                  ))}
-                </div>
+                
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => handleDragEnd(event, cat)}
+                >
+                  <SortableContext
+                    items={bhajans.map((b) => b._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="flex flex-col gap-2">
+                      {bhajans.map((b) => (
+                        <SortableBhajanItem
+                          key={b._id}
+                          bhajan={b}
+                          onClick={() => setModalBhajan(b)}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </motion.div>
             ))}
           </motion.div>
