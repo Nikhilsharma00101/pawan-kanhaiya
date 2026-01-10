@@ -87,7 +87,7 @@ function SortableBhajanRow({
       style={style}
       onClick={onSelect}
       className={`flex items-center gap-2 p-3 rounded-xl cursor-pointer border
-      ${active
+        ${active
           ? "bg-amber-100 border-amber-400"
           : "bg-white/80 border-amber-200 hover:bg-amber-50"
         }`}
@@ -122,7 +122,6 @@ export default function LaddiHero() {
       const data: BhajanPart[] = await res.json();
       setParts(data);
     }
-
     load();
   }, []);
 
@@ -146,21 +145,13 @@ export default function LaddiHero() {
 
     if (!sourcePartId || !targetPartId) return;
 
-    const sourcePart = parts.find((p) => p._id === sourcePartId)!;
-    const targetPart = parts.find((p) => p._id === targetPartId)!;
-
-    const sourceIndex = sourcePart.bhajans.findIndex(
-      (b) => b._id === active.id
-    );
-    const targetIndex = targetPart.bhajans.findIndex(
-      (b) => b._id === over.id
-    );
-
-    // 🔥 optimistic update
     setParts((prev) => {
       const clone = structuredClone(prev);
       const src = clone.find((p) => p._id === sourcePartId)!;
       const tgt = clone.find((p) => p._id === targetPartId)!;
+
+      const sourceIndex = src.bhajans.findIndex((b) => b._id === active.id);
+      const targetIndex = tgt.bhajans.findIndex((b) => b._id === over.id);
 
       const [moved] = src.bhajans.splice(sourceIndex, 1);
       tgt.bhajans.splice(targetIndex, 0, moved);
@@ -168,7 +159,6 @@ export default function LaddiHero() {
       return clone;
     });
 
-    // 🔥 persist
     await fetch("/api/laddi/reorder", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -179,16 +169,15 @@ export default function LaddiHero() {
         overId: over.id,
       }),
     });
-
   }
 
   /* ---------- RENDER ---------- */
 
   const BhajanList = (
-    <div className="space-y-6 overflow-y-auto max-h-[75vh] pr-2">
+    <div className="h-full overflow-y-auto pr-2 space-y-6">
       {parts.map((part) => (
         <div key={part._id}>
-          <h3 className="text-lg font-bold text-amber-800 mb-3">
+          <h3 className="text-lg font-bold text-amber-800 mb-3 sticky top-0 bg-white/90 backdrop-blur z-10 py-1">
             {part.title}
           </h3>
 
@@ -258,7 +247,9 @@ export default function LaddiHero() {
           {isDesktop ? (
             <div className="grid grid-cols-[3fr_1.4fr] gap-8">
               {LyricsView}
-              <aside className="bg-white/70 rounded-3xl p-6 border border-amber-200 shadow">
+
+              {/* ✅ STICKY + SCROLLABLE SIDEBAR */}
+              <aside className="sticky top-28 h-[calc(100vh-7rem)] overflow-hidden bg-white/70 rounded-3xl p-6 border border-amber-200 shadow">
                 {BhajanList}
               </aside>
             </div>
