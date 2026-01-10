@@ -1,12 +1,14 @@
 import { connectDB } from "@/lib/mongodb";
 import BhajanPart from "@/models/BhajanPart";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
+
+  const { id } = await params; // ✅ IMPORTANT
   const { title } = await req.json();
 
   if (!title?.trim()) {
@@ -17,7 +19,7 @@ export async function PATCH(
   }
 
   const updated = await BhajanPart.findByIdAndUpdate(
-    params.id,
+    id,
     { title: title.trim() },
     { new: true }
   );
